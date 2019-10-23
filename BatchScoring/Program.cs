@@ -8,7 +8,6 @@ namespace BatchScoring
 {
     class Program
     {
-        /*
         private const string Tenant = "YOUR_SERVICE_PRINCIPAL_TENANT";
         private const string ClientId = "YOUR_CLIENT_ID";
         private const string ClientSecret = "YOUR_CLIENT_SECRET";
@@ -19,17 +18,6 @@ namespace BatchScoring
 
         // URL captured right from portal. 
         private const string PipelineUrl = "YOUR_AMLS_PIPELINE_URI";
-        */
-        private const string Tenant = "72f988bf-86f1-41af-91ab-2d7cd011db47";
-        private const string ClientId = "31e5a315-c086-41f0-bf53-c06107960c2d";
-        private const string ClientSecret = "xzn8xCIRorI1aVNF8eAegCW2sgsPxHc0TxbG9L1S8I8=";
-
-        // Experiment to launch
-        private const String ExperimentName = "exp_191018132824";
-        private const String BatchStartPayload = "{\"ExperimentName\" : \"" + ExperimentName + "\"}";
-
-        // URL captured right from portal. 
-        private const string PipelineUrl = "https://eastus.aether.ms/api/v1.0/subscriptions/edf507a2-6235-46c5-b560-fd463ba2e771/resourceGroups/dangbatchtest/providers/Microsoft.MachineLearningServices/workspaces/ws191018122811/PipelineRuns/PipelineSubmit/b4895c69-cf70-4a57-b486-c78e1a9e5436";
 
         static void Main(string[] args)
         {
