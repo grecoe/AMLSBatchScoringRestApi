@@ -8,15 +8,32 @@ namespace BatchScoring
 {
     class Program
     {
+        /*
         private const string Tenant = "YOUR_SERVICE_PRINCIPAL_TENANT";
         private const string ClientId = "YOUR_CLIENT_ID";
         private const string ClientSecret = "YOUR_CLIENT_SECRET";
 
-       // URL captured right from portal. 
+        // Experiment to launch
+        private const String ExperimentName = "YOUR_EXPERIMENT_NAME";
+        private const String BatchStartPayload = "{\"ExperimentName\" : \"" + ExperimentName + "\"}";
+
+        // URL captured right from portal. 
         private const string PipelineUrl = "YOUR_AMLS_PIPELINE_URI";
+        */
+        private const string Tenant = "72f988bf-86f1-41af-91ab-2d7cd011db47";
+        private const string ClientId = "31e5a315-c086-41f0-bf53-c06107960c2d";
+        private const string ClientSecret = "xzn8xCIRorI1aVNF8eAegCW2sgsPxHc0TxbG9L1S8I8=";
+
+        // Experiment to launch
+        private const String ExperimentName = "exp_191018132824";
+        private const String BatchStartPayload = "{\"ExperimentName\" : \"" + ExperimentName + "\"}";
+
+        // URL captured right from portal. 
+        private const string PipelineUrl = "https://eastus.aether.ms/api/v1.0/subscriptions/edf507a2-6235-46c5-b560-fd463ba2e771/resourceGroups/dangbatchtest/providers/Microsoft.MachineLearningServices/workspaces/ws191018122811/PipelineRuns/PipelineSubmit/b4895c69-cf70-4a57-b486-c78e1a9e5436";
 
         static void Main(string[] args)
         {
+
             // Create a Service Pricipal Authentication object using the Tenant, ClientId and ClientSecret.
             // To learn how to create an Azure Service Principal see here:
             //  https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal
@@ -28,12 +45,24 @@ namespace BatchScoring
             Console.WriteLine("Collecting AAD token......");
             String aadToken = spa.GetToken().Result;
 
+            ///
+            /// Get the status' of all the pipeline runs
+            ///
+            Console.WriteLine("Start the pipeline......");
+            PipelineRequest start = pipelineUrl.GetJobTrigger();
+            RunResult startResult = RestRequest.StartBatchJob<RunResult>(start, aadToken, BatchStartPayload);
+            Console.WriteLine("***** JOB START ************");
+            Console.WriteLine(String.Format("Succesful start : {0}", startResult.IsStarted()));
+            if(startResult.IsStarted())
+            {
+                Console.WriteLine(String.Format("Run ID : {0}", startResult.Id));
+            }
 
             ///
             /// Get the status' of all the pipeline runs
             ///
             Console.WriteLine("Collecting all Pipeline Runs......");
-            PiplelineRequest prAll = pipelineUrl.GetRunStatus();
+            PipelineRequest prAll = pipelineUrl.GetRunStatus();
             List<RunResult> rr = RestRequest.GetRunResults<List<RunResult>>(prAll, aadToken);
             Console.WriteLine("***** MULTIPLE RUNS ************");
             foreach(RunResult r in rr)
@@ -50,7 +79,7 @@ namespace BatchScoring
                 Console.WriteLine("Collecting one Pipeline Run......");
 
                 string runId = rr[rr.Count - 1].Id;
-                PiplelineRequest prOne = pipelineUrl.GetRunStatus(runId);
+                PipelineRequest prOne = pipelineUrl.GetRunStatus(runId);
                 RunResult sr = RestRequest.GetRunResults<RunResult>(prOne, aadToken);
 
                 Console.WriteLine("***** SINGLE RUN ************");

@@ -1,6 +1,43 @@
 ﻿using System;
 
-/* ACTUAL RETURN FROM REST
+/* ACTUAL RETURN FROM BATCH START
+{
+  "Description": null,
+  "Status": {
+    "StatusCode": 0,
+    "StatusDetail": null,
+    "CreationTime": "2019-10-23T14:48:39.5010395Z",
+    "EndTime": null
+  },
+  "GraphId": "cebd3437-d350-4bd9-a981-a1dd82806f08",
+  "IsSubmitted": false,
+  "HasErrors": false,
+  "HasWarnings": false,
+  "UploadState": 0,
+  "ParameterAssignments": {},
+  "DataSetDefinitionValueAssignment": null,
+  "RunHistoryExperimentName": "exp_191018132824",
+  "PipelineId": "b4895c69-cf70-4a57-b486-c78e1a9e5436",
+  "RunSource": "Unavailable",
+  "RunType": 0,
+  "TotalRunSteps": 15,
+  "ScheduleId": null,
+  "tags": {},
+  "Properties": {},
+  "CreatedBy": {
+    "UserObjectId": "2d562b0e-a830-4dff-9e4a-29c8a4eba381",
+    "UserTenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+    "UserName": "31e5a315-c086-41f0-bf53-c06107960c2d"
+  },
+  "EntityStatus": 0,
+  "Id": "f9629edf-9ef6-41a3-ac30-76fe82ba0154",
+  "Etag": "\"8d01fcb3-0000-0100-0000-5db068470000\"",
+  "CreatedDate": "1970-01-01T00:00:00",
+  "LastModifiedDate": "1970-01-01T00:00:00"
+}
+*/
+
+/* ACTUAL RETURN FROM REST RUN STATUS. which is identical to run start.
 {
     "Description": "dangbatchtest_sched",
     "Status": {
@@ -74,6 +111,11 @@ namespace BatchScoring
         public bool IsComplete()
         {
             return !String.IsNullOrEmpty(this.Status.CreationTime) && !String.IsNullOrEmpty(this.Status.EndTime);
+        }
+
+        public bool IsStarted()
+        {
+            return !String.IsNullOrEmpty(this.Status.CreationTime);
         }
 
         public bool IsSuccess()

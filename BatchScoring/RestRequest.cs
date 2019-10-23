@@ -20,13 +20,32 @@ namespace BatchScoring
     class RestRequest
     {
         /// <summary>
+        /// Start an experiment and get the results.
+        /// </summary>
+        /// <typeparam name="T">Type of object to retrieve</typeparam>
+        /// <param name="requestInfo">Info for retrieving one or many run results</param>
+        /// <param name="authToken">AAD Token for SP</param>
+        /// <param name="payload">Job start body - {"ExperimentName" : "NAME"} </param>
+        /// <returns>Results of the call as a T or null on failure. </returns>
+        public static T StartBatchJob<T>(PipelineRequest requestInfo, string authToken, string payload) where T : class, new()
+        {
+            RestResponse rr = RestRequest.MakeRequest(requestInfo, authToken, payload, "application/json").Result;
+
+            if (rr.Content != null && rr.Content.Length > 0)
+            {
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(rr.Content);
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Get the results of a run or batch of runs
         /// </summary>
         /// <typeparam name="T">List<RunResult> or RunResult</RunResult></typeparam>
         /// <param name="requestInfo">Info for retrieving one or many run results</param>
         /// <param name="authToken">AAD Token for SP</param>
-        /// <returns></returns>
-        public static T GetRunResults<T>(PiplelineRequest requestInfo, String authToken) where T: class, new()
+        /// <returns>Results of the call as a T or null on failure. </returns>
+        public static T GetRunResults<T>(PipelineRequest requestInfo, string authToken) where T: class, new()
         {
             RestResponse rr = RestRequest.MakeRequest(requestInfo, authToken).Result;
 
@@ -46,7 +65,7 @@ namespace BatchScoring
         /// <param name="payload">Optional payload parameter</param>
         /// <param name="payloadType">Optional payload type parameter, i.e. "application/json"</param>
         /// <returns></returns>
-        public static async Task<RestResponse> MakeRequest(PiplelineRequest requestInfo, String authToken, String payload = null, String payloadType = null)
+        private static async Task<RestResponse> MakeRequest(PipelineRequest requestInfo, string authToken, string payload = null, string payloadType = null)
         {
             RestResponse returnResponse = null;
 

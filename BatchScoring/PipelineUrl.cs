@@ -25,20 +25,10 @@ namespace BatchScoring
     /// Class used externally to capture the HTTP Method for the call the user wants to make
     /// along with the appropriate URL
     /// </summary>
-    public class PiplelineRequest
+    public class PipelineRequest
     {
         public HttpMethod Method { get; set; }
         public String Url { get; set; }
-    }
-
-    /// <summary>
-    /// Internal class to help strip down the original URI
-    /// </summary>
-    class ParseResult
-    {
-        public String OriginalInput { get; set; }
-        public String DesiredPart { get; set; }
-        public String RemainingInput { get; set; }
     }
 
     /// <summary>
@@ -68,19 +58,18 @@ namespace BatchScoring
         {
             this.ProvidedUrl = providedUrl;
 
-            ParseResult pr = this.GetLastPathElement(this.ProvidedUrl);
-            this.PipelineId = pr.DesiredPart;
-
-            pr = this.GetLastPathElement(pr.RemainingInput);
-            this.BaseUrl = pr.RemainingInput;
+            // Strip off the pipelineid and the PipelineRuns to get the base URL
+            string[] part = this.ProvidedUrl.Split(new char[] { '/' });
+            this.PipelineId = part[part.Length - 1];
+            this.BaseUrl = String.Join('/', part, 0, part.Length - 2);
         }
 
         /// <summary>
         /// Get the appropriate HTTP Method and URL to trigger a job.
         /// </summary>
-        public PiplelineRequest GetJobTrigger()
+        public PipelineRequest GetJobTrigger()
         {
-            PiplelineRequest returnRequest = new PiplelineRequest()
+            PipelineRequest returnRequest = new PipelineRequest()
             {
                 Method = System.Net.Http.HttpMethod.Post,
                 Url = this.ProvidedUrl
@@ -92,9 +81,9 @@ namespace BatchScoring
         /// <summary>
         /// Get the appropriate HTTP Method and URL to get all job status'.
         /// </summary>
-        public PiplelineRequest GetRunStatus()
+        public PipelineRequest GetRunStatus()
         {
-            PiplelineRequest returnRequest = new PiplelineRequest()
+            PipelineRequest returnRequest = new PipelineRequest()
             {
                 Method = System.Net.Http.HttpMethod.Get,
                 Url = this.BaseUrl + "/Pipeline/" + this.PipelineId
@@ -106,9 +95,9 @@ namespace BatchScoring
         /// <summary>
         /// Get the appropriate HTTP Method and URL to get a single job status.
         /// </summary>
-        public PiplelineRequest GetRunStatus(string jobRun)
+        public PipelineRequest GetRunStatus(string jobRun)
         {
-            PiplelineRequest returnRequest = new PiplelineRequest()
+            PipelineRequest returnRequest = new PipelineRequest()
             {
                 Method = System.Net.Http.HttpMethod.Get,
                 Url = this.BaseUrl + "/" + jobRun
@@ -116,24 +105,5 @@ namespace BatchScoring
 
             return returnRequest;
         }
-
-        #region Private Methods
-        /// <summary>
-        /// Basic helper method to strip down a URL 
-        /// </summary>
-        /// <param name="path">URL path to strip off the last element</param>
-        /// <returns>ParseResult which has the original, stripped component and remainder. </returns>
-        private ParseResult GetLastPathElement(string path)
-        {
-            ParseResult pr = new ParseResult();
-            pr.OriginalInput = path;
-
-            int pathIndex = pr.OriginalInput.LastIndexOf('/');
-            pr.DesiredPart = pr.OriginalInput.Substring(pathIndex + 1);
-            pr.RemainingInput = pr.OriginalInput.Substring(0, pathIndex);
-
-            return pr;
-        }
-        #endregion
     }
 }
